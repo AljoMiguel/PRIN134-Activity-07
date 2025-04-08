@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Basketball Shooting Competition</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f3f4f6;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background-color: #f3f4f6;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+    
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #111827;
+    }
+    
+    .competition-area {
+      display: flex;
+      gap: 20px;
+    }
+    
+    .panel {
+      flex: 1;
+      background-color: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .panel-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .player-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    .player-item {
+      padding: 10px;
+      margin-bottom: 8px;
+      background-color: #f9fafb;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .player-item.finalist {
+      background-color: #dbeafe;
+    }
+    
+    .player-item.champion {
+      background-color: #fef3c7;
+      border: 2px solid #fbbf24;
+    }
+    
+    .player-info {
+      display: flex;
+      align-items: center;
+    }
+    
+    .player-number {
+      font-weight: 600;
+      margin-right: 8px;
+    }
+    
+    .player-name {
+      font-weight: 700;
+    }
+    
+    .player-team {
+      color: #6b7280;
+      font-size: 0.875rem;
+      margin-left: 8px;
+    }
+    
+    .player-stats {
+      display: flex;
+      align-items: center;
+    }
+    
+    .attempts {
+      display: flex;
+      gap: 4px;
+      margin-right: 8px;
+    }
+    
+    .attempt-success {
+      color: #10b981;
+      font-weight: bold;
+    }
+    
+    .attempt-fail {
+      color: #ef4444;
+    }
+    
+    .player-score {
+      font-weight: 700;
+      margin-right: 8px;
+    }
+    
+    .remove-btn {
+      color: #ef4444;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    
+    .remove-btn:hover {
+      color: #b91c1c;
+    }
+    
+    .add-form {
+      padding: 12px;
+      background-color: #f9fafb;
+      border-radius: 6px;
+      margin-bottom: 15px;
+    }
+    
+    .form-row {
+      margin-bottom: 12px;
+    }
+    
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    
+    .btn-sm {
+      padding: 4px 8px;
+      font-size: 0.875rem;
+    }
+    
+    .btn-green {
+      background-color: #10b981;
+    }
+    
+    .btn-green:hover {
+      background-color: #059669;
+    }
+    
+    .btn-blue {
+      background-color: #3b82f6;
+    }
+    
+    .btn-blue:hover {
+      background-color: #2563eb;
+    }
+    
+    .btn-orange {
+      background-color: #f97316;
+    }
+    
+    .btn-orange:hover {
+      background-color: #ea580c;
+    }
+    
+    .btn-purple {
+      background-color: #8b5cf6;
+    }
+    
+    .btn-purple:hover {
+      background-color: #7c3aed;
+    }
+    
+    .btn-disabled {
+      background-color: #9ca3af;
+      cursor: not-allowed;
+    }
+    
+    .btn-centered {
+      display: block;
+      margin: 15px auto 0;
+    }
+    
+    .game-log {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    .log-entry {
+      padding: 8px;
+      background-color: #f9fafb;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      font-size: 0.875rem;
+    }
+    
+    .empty-message {
+      text-align: center;
+      color: #6b7280;
+      padding: 20px;
+    }
+    
+    .champion-banner {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #fef3c7;
+      border: 2px solid #fbbf24;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .champion-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🏀 NBA Shooting Competition</h1>
+    
+    <div class="competition-area">
+      <div class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title" id="player-count">Players (7)</h2>
+          <button id="add-player-btn" class="btn btn-sm btn-green">+ Add Player</button>
+        </div>
+        
+        <div id="add-form-container" style="display: none;">
+          <div class="add-form">
+            <div class="form-row">
+              <input type="text" id="player-name-input" placeholder="Player Name">
+            </div>
+            <div class="form-row">
+              <input type="text" id="player-team-input" placeholder="Team Name">
+            </div>
+            <button id="submit-player-btn" class="btn btn-blue">Add</button>
+          </div>
+        </div>
+        
+        <div id="player-list" class="player-list">
+        
+        </div>
+        
+        <button id="start-btn" class="btn btn-blue btn-centered">Start Competition</button>
+        <button id="rankings-btn" class="btn btn-green btn-centered" style="display: none;">Show Rankings</button>
+        <button id="tiebreaker-btn" class="btn btn-orange btn-centered" style="display: none;">Run Tiebreaker</button>
+        <button id="reset-btn" class="btn btn-purple btn-centered" style="display: none;">New Competition</button>
+      </div>
+      
+      <div class="panel">
+        <h2 class="panel-title">Game Log</h2>
+        <div id="game-log" class="game-log">
+          <div class="empty-message">Competition has not started yet. Add players and click Start.</div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="champion-banner" class="champion-banner" style="display: none;">
+      <h2 class="champion-title">🏆 Champion: <span id="champion-name"></span></h2>
+      <p>Final Score: <span id="champion-score"></span></p>
+    </div>
+  </div>
+
+  <script>
+   
+    const gameState = {
+      status: 'initial', 
+      athletes: [
+        { name: "Trae", team: "Hawks", score: 0, attempts: [] },
+        { name: "Brunson", team: "Knicks", score: 0, attempts: [] },
+        { name: "Curry", team: "Warriors", score: 0, attempts: [] },
+        { name: "Giannis", team: "Bucks", score: 0, attempts: [] },
+        { name: "Luka", team: "Lakers", score: 0, attempts: [] },
+        { name: "Westbrook", team: "Nuggets", score: 0, attempts: [] },
+        { name: "Harden", team: "Clippers", score: 0, attempts: [] }
+      ],
+      finalists: [],
+      champion: null,
+      gameLog: []
+    };
+
+   
+    const playerList = document.getElementById('player-list');
+    const playerCount = document.getElementById('player-count');
+    const gameLog = document.getElementById('game-log');
+    const addPlayerBtn = document.getElementById('add-player-btn');
+    const addFormContainer = document.getElementById('add-form-container');
+    const playerNameInput = document.getElementById('player-name-input');
+    const playerTeamInput = document.getElementById('player-team-input');
+    const submitPlayerBtn = document.getElementById('submit-player-btn');
+    const startBtn = document.getElementById('start-btn');
+    const rankingsBtn = document.getElementById('rankings-btn');
+    const tiebreakerBtn = document.getElementById('tiebreaker-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const championBanner = document.getElementById('champion-banner');
+    const championName = document.getElementById('champion-name');
+    const championScore = document.getElementById('champion-score');
+
+   
+    function init() {
+      renderPlayers();
+      setupEventListeners();
+    }
+
+ 
+    function setupEventListeners() {
+      addPlayerBtn.addEventListener('click', toggleAddForm);
+      submitPlayerBtn.addEventListener('click', addPlayer);
+      startBtn.addEventListener('click', startGame);
+      rankingsBtn.addEventListener('click', determineRankings);
+      tiebreakerBtn.addEventListener('click', runTiebreaker);
+      resetBtn.addEventListener('click', resetGame);
+    }
+
+   
+    function toggleAddForm() {
+      const isVisible = addFormContainer.style.display !== 'none';
+      addFormContainer.style.display = isVisible ? 'none' : 'block';
+      addPlayerBtn.textContent = isVisible ? '+ Add Player' : 'Cancel'; 
+    }
+
+    
+    function addPlayer() {
+      const name = playerNameInput.value.trim();
+      const team = playerTeamInput.value.trim();
+      
+      if (!name || !team) {
+        return;
+      }
+      
+      const newPlayer = {
+        name,
+        team,
+        score: 0,
+        attempts: []
+      };
+      
+      gameState.athletes.push(newPlayer);
+      renderPlayers();
+      
+      playerNameInput.value = '';
+      playerTeamInput.value = '';
+      addFormContainer.style.display = 'none';
+      addPlayerBtn.textContent = '+ Add Player';
+      
+      addLogEntry(`🏀 Added new player: ${newPlayer.name} (${newPlayer.team})`);
+    }
+
+    
+    function removePlayer(index) {
+      if (gameState.status !== 'initial') return;
+      
+      const playerToRemove = gameState.athletes[index];
+      gameState.athletes.splice(index, 1);
+      renderPlayers();
+      
+      addLogEntry(`❌ Removed player: ${playerToRemove.name}`);
+    }
+
+    
+    function startGame() {
+      if (gameState.athletes.length < 2) {
+        addLogEntry("⚠️ Need at least 2 players to start the competition!");
+        return;
+      }
+      
+      gameState.status = 'shooting';
+      addLogEntry("🏀 The Shooting Competition Starts Now!");
+      
+     
+      setTimeout(() => {
+        simulateShootingRound();
+        renderPlayers();
+        
+        startBtn.style.display = 'none';
+        rankingsBtn.style.display = 'block';
+      }, 1000);
+    }
+
+   
+    function simulateShootingRound() {
+      gameState.athletes.forEach(player => {
+        const results = Array.from({ length: 5 }, () => Math.random() > 0.5);
+        player.score = results.filter(Boolean).length;
+        player.attempts = results;
+      });
+      
+      gameState.status = 'ranking';
+    }
+
+   
+    function determineRankings() {
+      gameState.athletes.sort((a, b) => b.score - a.score);
+      
+      addLogEntry("🏆 Rankings:");
+      gameState.athletes.forEach((p, i) => {
+        addLogEntry(`${i + 1}. ${p.name} - ${p.score} points`);
+      });
+      
+      const highestScore = gameState.athletes[0].score;
+      const potentialFinalists = gameState.athletes.filter(p => p.score === highestScore);
+      
+      if (potentialFinalists.length === 1) {
+        gameState.champion = potentialFinalists[0];
+        addLogEntry(`🏆 The Champion is ${potentialFinalists[0].name} with ${potentialFinalists[0].score} points!`);
+        gameState.status = 'finished';
+        
+        championName.textContent = gameState.champion.name;
+        championScore.textContent = gameState.champion.score;
+        championBanner.style.display = 'block';
+        
+        rankingsBtn.style.display = 'none';
+        resetBtn.style.display = 'block';
+      } else {
+        gameState.finalists = potentialFinalists;
+        gameState.status = 'tiebreaker';
+        addLogEntry(`🔥 Tiebreaker for: ${potentialFinalists.map(p => p.name).join(", ")}`);
+        
+        rankingsBtn.style.display = 'none';
+        tiebreakerBtn.style.display = 'block';
+      }
+      
+      renderPlayers();
+    }
+
+    
+    function runTiebreaker() {
+      gameState.finalists.forEach(player => {
+        const results = Array.from({ length: 3 }, () => Math.random() > 0.5);
+        player.score = results.filter(Boolean).length;
+        player.attempts = results;
+      });
+      
+      const highestScore = Math.max(...gameState.finalists.map(p => p.score));
+      const winners = gameState.finalists.filter(p => p.score === highestScore);
+      
+      if (winners.length === 1) {
+        gameState.champion = winners[0];
+        addLogEntry(`🏆 The Champion is ${winners[0].name} with ${winners[0].score} points!`);
+        gameState.status = 'finished';
+        
+        championName.textContent = gameState.champion.name;
+        championScore.textContent = gameState.champion.score;
+        championBanner.style.display = 'block';
+        
+        tiebreakerBtn.style.display = 'none';
+        resetBtn.style.display = 'block';
+      } else {
+        gameState.finalists = winners;
+        addLogEntry(`🔥 Another tiebreaker for: ${winners.map(p => p.name).join(", ")}`);
+      }
+      
+      renderPlayers();
+    }
+
+   
+    function resetGame() {
+      gameState.athletes.forEach(player => {
+        player.score = 0;
+        player.attempts = [];
+      });
+      
+      gameState.status = 'initial';
+      gameState.finalists = [];
+      gameState.champion = null;
+      gameState.gameLog = [];
+      
+      championBanner.style.display = 'none';
+      
+      startBtn.style.display = 'block';
+      rankingsBtn.style.display = 'none';
+      tiebreakerBtn.style.display = 'none';
+      resetBtn.style.display = 'none';
+      
+      renderPlayers();
+      renderGameLog();
+    }
+
+    
+    function addLogEntry(message) {
+      gameState.gameLog.push(message);
+      renderGameLog();
+    }
+
+   
+    function renderPlayers() {
+      playerList.innerHTML = '';
+      playerCount.textContent = `Players (${gameState.athletes.length})`;
+      
+      if (gameState.athletes.length === 0) {
+        const emptyMessage = document.createElement('div');
+        emptyMessage.className = 'empty-message';
+        emptyMessage.textContent = 'No players added yet. Add some players to start.';
+        playerList.appendChild(emptyMessage);
+        return;
+      }
+      
+      gameState.athletes.forEach((player, index) => {
+        const isFinalist = gameState.finalists.some(f => f.name === player.name);
+        const isChampion = gameState.champion && gameState.champion.name === player.name;
+        
+        const playerItem = document.createElement('div');
+        playerItem.className = `player-item ${isFinalist ? 'finalist' : ''} ${isChampion ? 'champion' : ''}`;
+        
+      
+        const playerInfo = document.createElement('div');
+        playerInfo.className = 'player-info';
+        
+        const playerNumber = document.createElement('span');
+        playerNumber.className = 'player-number';
+        playerNumber.textContent = `${index + 1}.`;
+        
+        const playerName = document.createElement('span');
+        playerName.className = 'player-name';
+        playerName.textContent = player.name;
+        
+        const playerTeam = document.createElement('span');
+        playerTeam.className = 'player-team';
+        playerTeam.textContent = `(${player.team})`;
+        
+        playerInfo.appendChild(playerNumber);
+        playerInfo.appendChild(playerName);
+        playerInfo.appendChild(playerTeam);
+        
+       
+        const playerStats = document.createElement('div');
+        playerStats.className = 'player-stats';
+        
+        if (player.attempts.length > 0) {
+          const attempts = document.createElement('div');
+          attempts.className = 'attempts';
+          
+          player.attempts.forEach(success => {
+            const attempt = document.createElement('span');
+            attempt.className = success ? 'attempt-success' : 'attempt-fail';
+            attempt.textContent = success ? '🏀' : '❌';
+            attempts.appendChild(attempt);
+          });
+          
+          playerStats.appendChild(attempts);
+        }
+        
+        const playerScore = document.createElement('span');
+        playerScore.className = 'player-score';
+        playerScore.textContent = player.score;
+        playerStats.appendChild(playerScore);
+        
+        if (gameState.status === 'initial') {
+          const removeBtn = document.createElement('button');
+          removeBtn.className = 'remove-btn';
+          removeBtn.textContent = '✕';
+          removeBtn.addEventListener('click', () => removePlayer(index));
+          playerStats.appendChild(removeBtn);
+        }
+        
+        playerItem.appendChild(playerInfo);
+        playerItem.appendChild(playerStats);
+        playerList.appendChild(playerItem);
+      });
+    }
+
+    
+    function renderGameLog() {
+      gameLog.innerHTML = '';
+      
+      if (gameState.gameLog.length === 0) {
+        const emptyMessage = document.createElement('div');
+        emptyMessage.className = 'empty-message';
+        emptyMessage.textContent = 'Competition has not started yet. Add players and click Start.';
+        gameLog.appendChild(emptyMessage);
+        return;
+      }
+      
+      gameState.gameLog.forEach(entry => {
+        const logEntry = document.createElement('div');
+        logEntry.className = 'log-entry';
+        logEntry.textContent = entry;
+        gameLog.appendChild(logEntry);
+      });
+      
+   
+      gameLog.scrollTop = gameLog.scrollHeight;
+    }
+
+  
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
